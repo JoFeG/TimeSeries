@@ -1,0 +1,10 @@
+# push!(LOAD_PATH, "./src/"); using ExpEval 
+# to be able to reload use the following. Functions exported via using remain the same, test using ExpEval.___
+
+push!(LOAD_PATH, "./src/") 
+include("./src/ExpEval.jl") # repeat to reload 
+
+
+ID = 101
+df = ExpEval.LoadDataSumary()
+TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true);
