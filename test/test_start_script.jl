@@ -1,8 +1,14 @@
 # push!(LOAD_PATH, "./src/"); using ExpEval 
 # to be able to reload use the following. Functions exported via using remain the same, test using ExpEval.___
 
+using DelimitedFiles
+using DataFrames
+using Distances
+using Downloads
+using DynamicAxisWarping
+
 push!(LOAD_PATH, "./src/") 
-include("./src/ExpEval.jl") # repeat to reload 
+include("../src/ExpEval.jl") # repeat to reload 
 
 
 ID = 101
