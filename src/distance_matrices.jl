@@ -10,7 +10,7 @@ function calculate_distance_matrix_euc(
     TEST, TEST_labels, TRAIN, TRAIN_labels = LoadDataBase(ID, DataSumary_df)
 
     if train
-        TRAIN_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TRAIN, TRAIN, dims=1)
+        TRAIN_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TRAIN, dims=1)
         out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_euc.csv" 
         writedlm(out_path,  TRAIN_dist_mat_euc, ',')
         println(out_path)
@@ -18,7 +18,7 @@ function calculate_distance_matrix_euc(
     
     
     if test
-        TEST_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TEST, TEST, dims=1)
+        TEST_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TEST, dims=1)
         out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc.csv" 
         writedlm(out_path,  TRAIN_dist_mat_euc, ',')
         println(out_path)
@@ -34,9 +34,11 @@ function load_distance_matrix(
     
     dataset = DataSumary_df[DataSumary_df.ID .== ID, :]
     in_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * T * "_dist_mat_" * dist * ".csv"
-    if isfile(in_path)
-        return readdlm(in_path, ',')
-    end
+    
+    isfile(in_path) || throw(ArgumentError("No matrix existing in path $in_path"))
+    
+    return readdlm(in_path, ',')
+
 end
 
 function calculate_distance_matrix_dtw(

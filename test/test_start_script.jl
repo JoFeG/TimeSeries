@@ -3,9 +3,6 @@
 
 using DelimitedFiles
 using DataFrames
-using Distances
-using Downloads
-using DynamicAxisWarping
 
 push!(LOAD_PATH, "./src/") 
 include("../src/ExpEval.jl") # repeat to reload 

@@ -32,8 +32,10 @@ function scatter_dist_matrices!(M1, M2; save_as="",label="", label1="", label2="
     maxdist = max(maximum(P1),maximum(P2))
     
     plot!([0,maxdist], [0,maxdist], label=nothing)
-    xlims!(.01*maxdist, .31*maxdist)
-    ylims!(.01*maxdist, .31*maxdist)
+    
+    zoom = .01*maxdist, 1.01*maxdist
+    xlims!(zoom)
+    ylims!(zoom)
     xlabel!(label1)
     ylabel!(label2)
     
