@@ -24,13 +24,15 @@ if false
     end
 end
 
+
+
 # Just for TEST dtw
 if true
     df = ExpEval.LoadDataSumary()
     dff = df[isa.(df.Length,Number), :] 
     nm_cap = 1000
     
-    dff = df[
+    dff = dff[
         (dff.Length .< nm_cap) .&
         (dff.Test .< nm_cap), :]
 
