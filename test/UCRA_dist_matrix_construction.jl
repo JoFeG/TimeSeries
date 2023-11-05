@@ -13,13 +13,13 @@ include("../src/ExpEval.jl")
 
 
 # TRAIN AND TEST euc
-if false
+if true
     df = ExpEval.LoadDataSumary()
     dff = df[isa.(df.Length,Number), :] 
     IDs = dff.ID
     
     Threads.@threads for ID in IDs
-        ExpEval.calculate_distance_matrix_euc(ID, df, train=true, test=true)
+        ExpEval.calculate_distance_matrix_euc(ID, df, train=false, test=true)
         println("------------------------------------------ $ID euc done")
     end
 end
@@ -27,7 +27,7 @@ end
 
 
 # Just for TEST dtw
-if true
+if false
     df = ExpEval.LoadDataSumary()
     dff = df[isa.(df.Length,Number), :] 
     nm_cap = 1000

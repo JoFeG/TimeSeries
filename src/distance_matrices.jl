@@ -20,7 +20,7 @@ function calculate_distance_matrix_euc(
     if test
         TEST_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TEST, dims=1)
         out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc.csv" 
-        writedlm(out_path,  TRAIN_dist_mat_euc, ',')
+        writedlm(out_path,  TEST_dist_mat_euc, ',')
         println(out_path)
     end
 end
