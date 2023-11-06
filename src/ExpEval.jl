@@ -17,5 +17,6 @@ module ExpEval
     include("UCR_archive_utils.jl")
     include("DTW_arrow.jl")
     include("distance_matrices.jl")
+    include("Indices.jl")
 
 end

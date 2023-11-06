@@ -21,13 +21,13 @@ IDs = dff.ID
 
 
 if isfile("Indices_df.csv") 
-    Indices_df = CSV.read("Indices_df.csv",DataFrame)
+    Indices_df = CSV.read("Indices_df.csv", DataFrame)
 else 
     Indices_df = dff[:,["ID","Name"]]
 end
 
 
-## MEAN SILHOUETTE INDEX
+## MEAN SILHOUETTE INDEX ##########################################################
 if false
     TRAIN_silhouettes_dtw = [zeros(dff[dff.ID .== ID,:].Train[1]) for ID in IDs]
     TRAIN_silhouettes_euc = [zeros(dff[dff.ID .== ID,:].Train[1]) for ID in IDs]
@@ -77,5 +77,94 @@ if false
 
     display(Indices_df)
 
-    CSV.write("ndices_df.csv",Indices_df)
+    CSV.write("Indices_df.csv",Indices_df)
+end
+
+## DUNN INDEX #####################################################################
+if true
+    I_TRAIN_di_dtw = zeros(length(IDs))
+    I_TRAIN_di_euc = zeros(length(IDs))
+
+    I_TEST_di_dtw = zeros(length(IDs))
+    I_TEST_di_euc = zeros(length(IDs))
+
+    for i = 1:length(IDs)
+        ID = IDs[i]
+
+        TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true);
+
+
+        TRAIN_assignments = ExpEval.relabelLabels(TRAIN_labels)
+
+        M_TRAIN_dtw = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
+        I_TRAIN_di_dtw[i] = ExpEval.dunnindex(TRAIN_assignments, M_TRAIN_dtw)
+        
+        M_TRAIN_euc = ExpEval.load_distance_matrix(ID, df, "TRAIN", "euc")
+        I_TRAIN_di_euc[i] = ExpEval.dunnindex(TRAIN_assignments, M_TRAIN_euc)
+         
+
+        TEST_assignments = ExpEval.relabelLabels(TEST_labels)
+
+        M_TEST_dtw = ExpEval.load_distance_matrix(ID, df, "TEST", "dtw")   
+        I_TEST_di_dtw[i] = ExpEval.dunnindex(TEST_assignments, M_TEST_dtw)
+
+        M_TEST_euc = ExpEval.load_distance_matrix(ID, df, "TEST", "euc")
+        I_TEST_di_euc[i] = ExpEval.dunnindex(TEST_assignments, M_TEST_euc)
+
+    end
+
+    Indices_df.TRAIN_di_dtw = I_TRAIN_di_dtw
+    Indices_df.TRAIN_di_euc = I_TRAIN_di_euc
+
+    Indices_df.TEST_di_dtw = I_TEST_di_dtw
+    Indices_df.TEST_di_euc = I_TEST_di_euc
+
+    display(Indices_df)
+
+    CSV.write("Indices_df.csv",Indices_df)
+end
+
+
+## GAMMA INDEX ####################################################################
+if true
+    I_TRAIN_ga_dtw = zeros(length(IDs))
+    I_TRAIN_ga_euc = zeros(length(IDs))
+
+    I_TEST_ga_dtw = zeros(length(IDs))
+    I_TEST_ga_euc = zeros(length(IDs))
+
+    for i = 1:length(IDs)
+        ID = IDs[i]
+
+        TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true);
+
+
+        TRAIN_assignments = ExpEval.relabelLabels(TRAIN_labels)
+
+        M_TRAIN_dtw = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
+        I_TRAIN_ga_dtw[i] = ExpEval.gammaindex(TRAIN_assignments, M_TRAIN_dtw)
+        
+        M_TRAIN_euc = ExpEval.load_distance_matrix(ID, df, "TRAIN", "euc")
+        I_TRAIN_ga_euc[i] = ExpEval.gammaindex(TRAIN_assignments, M_TRAIN_euc)
+         
+
+        TEST_assignments = ExpEval.relabelLabels(TEST_labels)
+
+        M_TEST_dtw = ExpEval.load_distance_matrix(ID, df, "TEST", "dtw")   
+        I_TEST_ga_dtw[i] = ExpEval.gammaindex(TEST_assignments, M_TEST_dtw)
+
+        M_TEST_euc = ExpEval.load_distance_matrix(ID, df, "TEST", "euc")
+        I_TEST_ga_euc[i] = ExpEval.gammaindex(TEST_assignments, M_TEST_euc)
+
+    end
+
+    Indices_df.TRAIN_ga_dtw = I_TRAIN_ga_dtw
+    Indices_df.TRAIN_ga_euc = I_TRAIN_ga_euc
+
+    Indices_df.TEST_ga_dtw = I_TEST_ga_dtw
+    Indices_df.TEST_ga_euc = I_TEST_ga_euc
+
+    display(Indices_df)
+
+    CSV.write("Indices_df.csv",Indices_df)
 end
