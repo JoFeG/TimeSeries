@@ -11,7 +11,7 @@ function dunnindex(
     n == size(dist)[1] || throw(DimensionMismatch("Distance Matrix and assignments dimension mismatch"))
     
     k = length(unique(assignments))
-    1:k == unique(assignments) || throw(ArgumentError("assignments vector is not of consecutive integer values"))
+    1:k == sort(unique(assignments)) || throw(ArgumentError("assignments vector is not of consecutive integer values"))
     
     δ = Inf * ones(k,k)
     for i = 1:k
@@ -42,7 +42,7 @@ function gammaindex(
     n == size(dist)[1] || throw(DimensionMismatch("Distance Matrix and assignments dimension mismatch"))
     
     k = length(unique(assignments))
-    1:k == unique(assignments) || throw(ArgumentError("assignments vector is not of consecutive integer values"))
+    1:k == sort(unique(assignments)) || throw(ArgumentError("assignments vector is not of consecutive integer values"))
     
     s_pluss = 0
     s_minus = 0
