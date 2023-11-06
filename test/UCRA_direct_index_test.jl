@@ -21,7 +21,7 @@ IDs = dff.ID
 
 
 if isfile("Indices_df.csv") 
-    Indices_df = CSV.write("ndices_df.csv",Indices_df)
+    Indices_df = CSV.read("Indices_df.csv",DataFrame)
 else 
     Indices_df = dff[:,["ID","Name"]]
 end

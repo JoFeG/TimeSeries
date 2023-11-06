@@ -1,3 +1,4 @@
+## julia --threads 4
 using Base.Threads
 thr = nthreads()
 
