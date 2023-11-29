@@ -63,5 +63,47 @@ function gammaindex(
     end
     
     ΓI = (s_pluss - s_minus) / (s_pluss + s_minus)
-    return ΓI     
+    return ΓI
+end
+
+
+function gammaindex2(
+        assignments::Vector{<:Int},
+        dist::Matrix{<:Real}
+    )
+    issymmetric(dist) || throw(ArgumentError("Distance Matrix is not symmetric"))
+    
+    n = length(assignments)
+    n == size(dist)[1] || throw(DimensionMismatch("Distance Matrix and assignments dimension mismatch"))
+    
+    k = length(unique(assignments))
+    1:k == sort(unique(assignments)) || throw(ArgumentError("assignments vector is not of consecutive integer values"))
+    
+    s_pluss = 0
+    s_minus = 0
+
+    for c = 1:k
+        c_indices = (1:n)[assignments .== c]
+        n_c = length(c_indices)
+        for p_c = 1:n_c
+            p = c_indices[p_c]
+            for q_c = p_c+1:n_c
+                q = c_indices[q_c]
+                for i = 1:n
+                    for j = i+1:n
+                        if assignments[i] != assignments[j]
+                            if dist[i,j] > dist[p,q]
+                                s_pluss = s_pluss + 1 
+                            elseif dist[i,j] < dist[p,q]
+                                s_minus = s_minus + 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    ΓI = (s_pluss - s_minus) / (s_pluss + s_minus)
+    return ΓI
 end

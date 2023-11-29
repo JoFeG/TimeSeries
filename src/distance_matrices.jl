@@ -2,7 +2,8 @@ function calculate_distance_matrix_euc(
         ID::Int, 
         DataSumary_df::DataFrame; 
         train::Bool = true,
-        test::Bool = true
+        test::Bool = true,
+        zscore::Bool = false
     )
     
     dataset = DataSumary_df[DataSumary_df.ID .== ID, :]
@@ -10,16 +11,30 @@ function calculate_distance_matrix_euc(
     TEST, TEST_labels, TRAIN, TRAIN_labels = LoadDataBase(ID, DataSumary_df)
 
     if train
+        if zscore
+            TRAIN = (TRAIN .- mean(TRAIN, dims=1)) ./ std(TRAIN, dims=1)
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_euc_z.csv"
+        else
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_euc.csv"
+        end
+        
         TRAIN_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TRAIN, dims=1)
-        out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_euc.csv" 
+        
         writedlm(out_path,  TRAIN_dist_mat_euc, ',')
         println(out_path)
     end
     
     
     if test
+        if zscore
+            TEST = (TEST .- mean(TEST, dims=1)) ./ std(TEST, dims=1)
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc_z.csv" 
+        else
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc.csv" 
+        end            
+            
         TEST_dist_mat_euc = Distances.pairwise(Distances.Euclidean(), TEST, dims=1)
-        out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc.csv" 
+        
         writedlm(out_path,  TEST_dist_mat_euc, ',')
         println(out_path)
     end
@@ -45,7 +60,8 @@ function calculate_distance_matrix_dtw(
         ID::Int, 
         DataSumary_df::DataFrame; 
         train::Bool = true,
-        test::Bool = true
+        test::Bool = true,
+        zscore::Bool = false
     )
 
     dataset = DataSumary_df[DataSumary_df.ID .== ID, :]
@@ -53,6 +69,13 @@ function calculate_distance_matrix_dtw(
     TEST, TEST_labels, TRAIN, TRAIN_labels = LoadDataBase(ID, DataSumary_df)
 
     if train
+        if zscore
+            TRAIN = (TRAIN .- mean(TRAIN, dims=1)) ./ std(TRAIN, dims=1)
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_dtw_z.csv" 
+        else
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_dtw.csv" 
+        end
+        
         n_TR = dataset.Train[]
         TRAIN_dist_mat_dtw = zeros(n_TR, n_TR)
         for i = 1:n_TR-1
@@ -61,12 +84,19 @@ function calculate_distance_matrix_dtw(
                 TRAIN_dist_mat_dtw[j,i] = TRAIN_dist_mat_dtw[i,j]
             end
         end
-        out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_dtw.csv" 
+        
         writedlm(out_path,  TRAIN_dist_mat_dtw, ',')
         println(out_path)
     end
         
     if test
+        if zscore
+            TEST = (TEST .- mean(TEST, dims=1)) ./ std(TEST, dims=1)
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_dtw_z.csv"
+        else
+            out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_dtw.csv"
+        end
+        
         n_TE = dataset.Test[]
         TEST_dist_mat_dtw = zeros(n_TE, n_TE)
         for i = 1:n_TE-1
@@ -75,7 +105,7 @@ function calculate_distance_matrix_dtw(
                 TEST_dist_mat_dtw[j,i] = TEST_dist_mat_dtw[i,j]
             end
         end
-        out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_dtw.csv" 
+ 
         writedlm(out_path,  TEST_dist_mat_dtw, ',')
         println(out_path)
     end

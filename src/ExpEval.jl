@@ -5,14 +5,15 @@ module ExpEval
     using Distances
     using Downloads
     using DynamicAxisWarping
+    using StatsBase
     # using ZipFile
 
 
     
     export LoadDataSumary,
            LoadDataBase,
-           calculate_distance_matrix_euc#,
-           # calculate_distance_matrices_dtw
+           calculate_distance_matrix_euc,
+           calculate_distance_matrices_dtw
     
     include("UCR_archive_utils.jl")
     include("DTW_arrow.jl")
