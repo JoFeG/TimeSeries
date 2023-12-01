@@ -12,7 +12,7 @@ function calculate_distance_matrix_euc(
 
     if train
         if zscore
-            TRAIN = (TRAIN .- mean(TRAIN, dims=1)) ./ std(TRAIN, dims=1)
+            TRAIN = (TRAIN .- mean(TRAIN, dims=2)) ./ std(TRAIN, dims=2)
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_euc_z.csv"
         else
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_euc.csv"
@@ -27,7 +27,7 @@ function calculate_distance_matrix_euc(
     
     if test
         if zscore
-            TEST = (TEST .- mean(TEST, dims=1)) ./ std(TEST, dims=1)
+            TEST = (TEST .- mean(TEST, dims=2)) ./ std(TEST, dims=2)
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc_z.csv" 
         else
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_euc.csv" 
@@ -70,7 +70,7 @@ function calculate_distance_matrix_dtw(
 
     if train
         if zscore
-            TRAIN = (TRAIN .- mean(TRAIN, dims=1)) ./ std(TRAIN, dims=1)
+            TRAIN = (TRAIN .- mean(TRAIN, dims=2)) ./ std(TRAIN, dims=2)
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_dtw_z.csv" 
         else
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TRAIN_dist_mat_dtw.csv" 
@@ -91,7 +91,7 @@ function calculate_distance_matrix_dtw(
         
     if test
         if zscore
-            TEST = (TEST .- mean(TEST, dims=1)) ./ std(TEST, dims=1)
+            TEST = (TEST .- mean(TEST, dims=2)) ./ std(TEST, dims=2)
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_dtw_z.csv"
         else
             out_path = "./UCRArchive_2018/" * dataset.Name[] * "/" * "TEST_dist_mat_dtw.csv"

@@ -35,7 +35,8 @@ if false
     
     dff = dff[
         (dff.Length .< nm_cap) .&
-        (dff.Test .< nm_cap), :]
+        (dff.Test .< nm_cap) .&
+        (dff.Train .< nm_cap), :]
 
     IDs = dff.ID
     Threads.@threads for ID in IDs
@@ -45,24 +46,7 @@ if false
 end
 
 
-# TRAIN AND TEST euc Z
-if false
-    df = ExpEval.LoadDataSumary()
-    dff = df[isa.(df.Length,Number), :] 
-    nm_cap = 1000
-    
-    dff = dff[
-        (dff.Length .< nm_cap) .&
-        (dff.Test .< nm_cap), :]
-    
-    IDs = dff.ID
-    
-    Threads.@threads for ID in IDs
-        ExpEval.calculate_distance_matrix_euc(ID, df, train=true, test=true, zscore = true)
-    end
-end
-
-# TRAIN and TEST dtw Z
+# TRAIN AND TEST euc Z and dtw Z
 if true
     df = ExpEval.LoadDataSumary()
     dff = df[isa.(df.Length,Number), :] 
@@ -70,11 +54,15 @@ if true
     
     dff = dff[
         (dff.Length .< nm_cap) .&
-        (dff.Test .< nm_cap), :]
-
+        (dff.Test .< nm_cap) .&
+        (dff.Train .< nm_cap), :]
+    
     IDs = dff.ID
+    
     Threads.@threads for ID in IDs
+        ExpEval.calculate_distance_matrix_euc(ID, df, train=true, test=true, zscore = true)
         ExpEval.calculate_distance_matrix_dtw(ID, df, train=true, test=true, zscore=true)
     end
 end
+
 
