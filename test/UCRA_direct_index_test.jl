@@ -19,7 +19,7 @@ dff = dff[
     :]
 IDs = dff.ID
 
-if false
+if true
     if isfile("Indices_df.csv") 
         Indices_df = CSV.read("Indices_df.csv", DataFrame)
     else 
@@ -169,13 +169,111 @@ if false
     CSV.write("Indices_df.csv",Indices_df)
 end
 
-
-
-
-###################################################################################
-###################################################################################
-
+## DAVIES BOULDIN INDEX ###########################################################
 if true
+    I_TRAIN_db_dtw = zeros(length(IDs))
+    I_TRAIN_db_euc = zeros(length(IDs))
+
+    I_TEST_db_dtw = zeros(length(IDs))
+    I_TEST_db_euc = zeros(length(IDs))
+
+    for i = 1:length(IDs)
+        ID = IDs[i]
+
+        TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true);
+
+
+        TRAIN_assignments = ExpEval.relabelLabels(TRAIN_labels)
+
+        M_TRAIN_dtw = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
+        MED_TRAIN_dtw = ExpEval.bestMedoids(TRAIN_assignments, M_TRAIN_dtw)
+        I_TRAIN_db_dtw[i] = ExpEval.daviesbouldinindex(TRAIN_assignments, M_TRAIN_dtw, medoids=MED_TRAIN_dtw)
+        
+        M_TRAIN_euc = ExpEval.load_distance_matrix(ID, df, "TRAIN", "euc")
+        MED_TRAIN_euc = ExpEval.bestMedoids(TRAIN_assignments, M_TRAIN_euc)
+        I_TRAIN_db_euc[i] = ExpEval.daviesbouldinindex(TRAIN_assignments, M_TRAIN_euc, medoids=MED_TRAIN_euc)
+         
+
+        TEST_assignments = ExpEval.relabelLabels(TEST_labels)
+
+        M_TEST_dtw = ExpEval.load_distance_matrix(ID, df, "TEST", "dtw")
+        MED_TEST_dtw = ExpEval.bestMedoids(TEST_assignments, M_TEST_dtw)
+        I_TEST_db_dtw[i] = ExpEval.daviesbouldinindex(TEST_assignments, M_TEST_dtw, medoids=MED_TEST_dtw)
+
+        M_TEST_euc = ExpEval.load_distance_matrix(ID, df, "TEST", "euc")
+        MED_TEST_euc = ExpEval.bestMedoids(TEST_assignments, M_TEST_euc)
+        I_TEST_db_euc[i] = ExpEval.daviesbouldinindex(TEST_assignments, M_TEST_euc, medoids=MED_TEST_euc)
+    end
+
+    Indices_df.TRAIN_db_dtw = I_TRAIN_db_dtw
+    Indices_df.TRAIN_db_euc = I_TRAIN_db_euc
+
+    Indices_df.TEST_db_dtw = I_TEST_db_dtw
+    Indices_df.TEST_db_euc = I_TEST_db_euc
+
+    display(Indices_df)
+
+    CSV.write("Indices_df.csv",Indices_df)
+end
+
+## CALINSKI HARABASZ INDEX ########################################################
+if true
+    I_TRAIN_ch_dtw = zeros(length(IDs))
+    I_TRAIN_ch_euc = zeros(length(IDs))
+
+    I_TEST_ch_dtw = zeros(length(IDs))
+    I_TEST_ch_euc = zeros(length(IDs))
+
+    for i = 1:length(IDs)
+        ID = IDs[i]
+
+        TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true);
+
+
+        TRAIN_assignments = ExpEval.relabelLabels(TRAIN_labels)
+
+        M_TRAIN_dtw = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
+        MED_TRAIN_dtw = ExpEval.bestMedoids(TRAIN_assignments, M_TRAIN_dtw)
+        C_TRAIN_dtw_idx = ExpEval.bestMedoids(ones(Int, length(TRAIN_assignments)), M_TRAIN_dtw)[1]
+        I_TRAIN_ch_dtw[i] = ExpEval.calinskiharabaszindex(TRAIN_assignments, M_TRAIN_dtw, medoids=MED_TRAIN_dtw, c=C_TRAIN_dtw_idx)
+        
+        M_TRAIN_euc = ExpEval.load_distance_matrix(ID, df, "TRAIN", "euc")
+        MED_TRAIN_euc = ExpEval.bestMedoids(TRAIN_assignments, M_TRAIN_euc)
+        C_TRAIN_euc_idx = ExpEval.bestMedoids(ones(Int, length(TRAIN_assignments)), M_TRAIN_euc)[1]
+        I_TRAIN_ch_euc[i] = ExpEval.calinskiharabaszindex(TRAIN_assignments, M_TRAIN_euc, medoids=MED_TRAIN_euc, c=C_TRAIN_euc_idx)
+         
+
+        TEST_assignments = ExpEval.relabelLabels(TEST_labels)
+
+        M_TEST_dtw = ExpEval.load_distance_matrix(ID, df, "TEST", "dtw")
+        MED_TEST_dtw = ExpEval.bestMedoids(TEST_assignments, M_TEST_dtw)
+        C_TEST_dtw_idx = ExpEval.bestMedoids(ones(Int, length(TEST_assignments)), M_TEST_dtw)[1]
+        I_TEST_ch_dtw[i] = ExpEval.calinskiharabaszindex(TEST_assignments, M_TEST_dtw, medoids=MED_TEST_dtw, c=C_TEST_dtw_idx)
+
+        M_TEST_euc = ExpEval.load_distance_matrix(ID, df, "TEST", "euc")
+        MED_TEST_euc = ExpEval.bestMedoids(TEST_assignments, M_TEST_euc)
+        C_TEST_euc_idx = ExpEval.bestMedoids(ones(Int, length(TEST_assignments)), M_TEST_euc)[1]
+        I_TEST_ch_euc[i] = ExpEval.calinskiharabaszindex(TEST_assignments, M_TEST_euc, medoids=MED_TEST_euc, c=C_TEST_euc_idx)
+
+
+    end
+
+    Indices_df.TRAIN_ch_dtw = I_TRAIN_ch_dtw
+    Indices_df.TRAIN_ch_euc = I_TRAIN_ch_euc
+
+    Indices_df.TEST_ch_dtw = I_TEST_ch_dtw
+    Indices_df.TEST_ch_euc = I_TEST_ch_euc
+
+    display(Indices_df)
+
+    CSV.write("Indices_df.csv",Indices_df)
+end
+
+
+###################################################################################
+###################################################################################
+
+if false
     if isfile("IndicesZ_df.csv") 
         IndicesZ_df = CSV.read("IndicesZ_df.csv", DataFrame)
     else 
@@ -373,7 +471,7 @@ if false
 end
 
 ## CALINSKI HARABASZ INDEX ########################################################
-if true
+if false
     I_TRAIN_ch_dtw = zeros(length(IDs))
     I_TRAIN_ch_euc = zeros(length(IDs))
 
