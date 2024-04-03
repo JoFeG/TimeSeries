@@ -7,7 +7,7 @@ TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df)
 TEST_labels = ExpEval.relabelLabels(TEST_labels)
 TRAIN_labels = ExpEval.relabelLabels(TRAIN_labels)
 
-function bestMedois(
+function bestMedoids(
         assignments::Vector{<:Int},
         dist::Matrix{<:Real}
     )
@@ -32,8 +32,8 @@ function bestMedois(
 end
 
 TEST_dist = ExpEval.load_distance_matrix(ID, df, "TEST", "euc")
-centers = bestMedois(TEST_labels, TEST_dist)
-c_idx = bestMedois(ones(Int, length(TEST_labels)), TEST_dist)[1]
+centers = bestMedoids(TEST_labels, TEST_dist)
+c_idx = bestMedoids(ones(Int, length(TEST_labels)), TEST_dist)[1]
 
 function daviesbouldinindex(
         assignments::Vector{<:Int},
