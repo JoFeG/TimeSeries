@@ -1,7 +1,7 @@
 using Clustering
 using LinearAlgebra
 
-include("test_start_script.jl")
+include("test_start_script.jl");
 TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df)
 
 TEST_labels = ExpEval.relabelLabels(TEST_labels)
