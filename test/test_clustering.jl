@@ -5,7 +5,7 @@ using DataFrames
 
 include("../src/ExpEval.jl") # repeat to reload 
 
-ID = 18
+ID = 57
 df = ExpEval.LoadDataSumary()
 TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true)
 
@@ -14,7 +14,14 @@ TRAIN_labels = ExpEval.relabelLabels(TRAIN_labels)
 
 M_TRAIN_dtw = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
 
-res1 = Clustering.kmedoids(M_TRAIN_dtw, 6)
 
-Clustering.varinfo(res1.assignments,TRAIN_labels)
+k = 6
+res_km = Clustering.kmedoids(M_TRAIN_dtw, k)
+
+Clustering.varinfo(res_km.assignments,TRAIN_labels)
+
+
+res_hc = Clustering.cutree(Clustering.hclust(M_TRAIN_dtw, linkage=:ward), k=k)
+
+Clustering.varinfo(res_hc,TRAIN_labels)
 
