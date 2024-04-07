@@ -1,4 +1,4 @@
-using Plots
+using StatsPlots
 using Statistics
 using DataFrames
 using CSV
@@ -31,19 +31,26 @@ for i = 1:5
     all_suc_rate_means[i] = sum_i / (2*2*4)
 end
     
-    
+index_labels = ["MS","DI","HΓ","DB","CH"]
 
 
 fig = plot(
-    size = (620,440),
-    grid = false
+    size = (310,220),
+    grid = :y
 )
 
+fo_y = font(8, family="sans-serif")
+fo_x = font(12, family="sans-serif")
 perm = sortperm(all_suc_rate_means, rev=true)
 bar!(
-    index[perm], 
+    index_labels[perm], 
     all_suc_rate_means[perm],
-    label = false
+    label = false,
+    yguidefont = fo_y,
+    ylabel = "Proportion of success",
+    ytickfont = fo_y,
+    yrotation = 90,
+    xtickfont = fo_x
 )
 
 savefig(fig, "figs/all_suc_rate_means.svg")
