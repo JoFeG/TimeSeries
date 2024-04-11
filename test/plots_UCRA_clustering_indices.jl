@@ -35,7 +35,7 @@ index_labels = ["MS","DI","HΓ","DB","CH"]
 
 
 fig = plot(
-    size = (310,220),
+    size = (2*310,2*220),
     grid = :y
 )
 
@@ -77,7 +77,7 @@ for i = 1:5
 end
 
 fig = plot(
-    size = (310,220),
+    size = (2*310,2*220),
     grid = :y
 )
 
@@ -118,7 +118,7 @@ for i = 1:5
 end
 
 fig = plot(
-    size = (310,220),
+    size = (2*310,2*220),
     grid = :y
 )
 
@@ -167,7 +167,7 @@ for i = 1:5
 end
 
 fig = plot(
-    size = (310,220),
+    size = (2*310,2*220),
     grid = :y
 )
 
@@ -223,7 +223,7 @@ for i = 1:5
 end
 
 fig = plot(
-    size = (310,220),
+    size = (2*310,2*220),
     grid = :y
 )
 
@@ -274,7 +274,7 @@ for i = 1:5
 end
 
 fig = plot(
-    size = (310,220),
+    size = (2*310,2*220),
     grid = :y
 )
 

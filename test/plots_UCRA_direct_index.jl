@@ -34,24 +34,26 @@ for i = 1:5
     end
 end
 
-index_name = ["Mean Silhouette" "Dunn Index" "Hubert Gamma" "Davies-Bouldin" "Calinski-Harabasz"]
+index_name = ["Mean Silhouette" "Dunn Index" "Hubert's Gamma" "Davies-Bouldin" "Calinski-Harabasz"]
+y_axis = [:identity, :log10, :identity, :log10, :log10]
+y_lims = [(-.35,1.01), (0.0035,1.2), (-0.11,1.01), (0.015,11), (900,100000)]
 
-i=3
-
-fig = plot(size = (310,220), grid = :y)
-fo_y = font(8, family="sans-serif")
-fo_x = font(12, family="sans-serif")
-violin!(
-    ["euc" "dtw" "euc" "dtw"], 
-    [direct_index[i,d,:] for d =1:4], 
-    label = ["original" false "normalized" false],
-    legend = :top,
-    yguidefont = fo_y,
-    ylabel = index_name[i],
-    ytickfont = fo_y,
-    yrotation = 90,
-    xtickfont = fo_x,
-    color = [RGBA(.9,.9,.9,1) RGBA(.9,.9,.9,1) RGBA(.2,.2,.2,.5) RGBA(.2,.2,.2,.5)]
-)
-
-savefig(fig, "figs/test.svg")
+for i in 1:5
+    fig = plot(size = (2*120,2*220), grid = :y)
+    fo_y = font(8, family="sans-serif")
+    fo_x = font(12, family="sans-serif")
+    violin!(
+        ["euc" "dtw" "euc" "dtw"], 
+        [direct_index[i,d,:] for d =1:4], 
+        label = ["original" false "normalized" false],
+        legend = :top,
+        yguidefont = fo_y,
+        title = index_name[i],
+        ytickfont = fo_y,
+        xtickfont = fo_x,
+        color = [RGBA(.9,.9,.9,.5) RGBA(.9,.9,.9,.5) RGBA(.2,.2,.2,.5) RGBA(.2,.2,.2,.5)],
+        yaxis = y_axis[i],
+        ylims = y_lims[i]
+    )
+    savefig(fig, "figs/violin_$(index[i]).svg")
+end
