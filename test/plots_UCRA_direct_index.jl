@@ -55,5 +55,5 @@ for i in 1:5
         yaxis = y_axis[i],
         ylims = y_lims[i]
     )
-    savefig(fig, "figs/violin_$(index[i]).svg")
+    savefig(fig, "figs/violin_$(index[i])_I.svg")
 end
