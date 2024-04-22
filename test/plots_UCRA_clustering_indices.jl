@@ -14,7 +14,7 @@ Indices_df = dff[
 alg = ["kmed","hclu"]
 index = ["ms","di","ga","db","ch"]
 set = ["TRAIN", "TEST"]
-dist = ["euc","dtw","euc_z","dtw_z"]
+dist = ["euc","euc_z","dtw","dtw_z"]
 
 all_suc_rate_means = zeros(5)
 
@@ -155,9 +155,9 @@ for i = 1:5
             col2 = join([alg[a], index[i], set[s], dist[2]],"_")
             sum_i2 = sum_i2 + mean(Indices_df[!, col2])
             col3 = join([alg[a], index[i], set[s], dist[3]],"_")
-            sum_i3 = sum_i3 + mean(Indices_df[!, col1])
+            sum_i3 = sum_i3 + mean(Indices_df[!, col3])
             col4 = join([alg[a], index[i], set[s], dist[4]],"_")
-            sum_i4 = sum_i4 + mean(Indices_df[!, col2])
+            sum_i4 = sum_i4 + mean(Indices_df[!, col4])
         end
     end
     dist_suc_rate_means[i,1] = sum_i1 / (2*2)
@@ -177,7 +177,7 @@ perm = sortperm(dist_suc_rate_means[:,1], rev=true)
 groupedbar!(
     index_labels[perm], 
     [dist_suc_rate_means[perm,1] dist_suc_rate_means[perm,2] dist_suc_rate_means[perm,3] dist_suc_rate_means[perm,4]],
-    label = [dist[1] dist[2] dist[3] dist[4]],
+    label = ["euc orig" "euc norm" "dtw orig" "dtw norm"],
     yguidefont = fo_y,
     ylabel = "Proportion of success",
     ytickfont = fo_y,
