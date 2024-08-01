@@ -101,3 +101,37 @@ for i in 1:5
     )
     savefig(fig, "figs/violin_$(index[i])_II.svg")
 end
+
+for i = 1:5
+    println("Index: $(index[i]):")
+    for d = 1:2
+        s=1
+        println("$(set[s]) $(dist[d]) mean = $(mean(direct_index[i,d,:]))")
+    end
+    println("$(set[1]) mean = $(mean(direct_index[i,1:2,:]))")
+    for d = 3:4
+        s=2
+        println("$(set[s]) $(dist[d]) mean = $(mean(direct_index[i,d,:]))")
+    end
+    println("$(set[2]) mean = $(mean(direct_index[i,3:4,:]))")
+    println("------------------------------------------------------------------")
+end
+println()
+
+
+rel_chan = zeros(5)
+for i = 1:5
+    println("Index: $(index[i]):")
+    TRAIN_mean = mean(direct_index[i,1:2,:])
+    TEST_mean = mean(direct_index[i,3:4,:])
+    rel_chan[i] = (TEST_mean - TRAIN_mean)/TEST_mean
+    println("relative change from TRAIN to TEST = $(rel_chan[i])")
+end
+println("All indices:")
+println("relative change from TRAIN to TEST = $(mean(rel_chan))")
+println()
+
+
+TRAIN_pref = 0.5*(.8*mean((direct_index[[1,2,3,5],1,:]-direct_index[[1,2,3,5],3,:]).>0)+.2*mean((direct_index[4,1,:]-direct_index[4,3,:]).<0)) + 0.5*(.8*mean((direct_index[[1,2,3,5],2,:]-direct_index[[1,2,3,5],4,:]).>0)+.2*mean((direct_index[4,2,:]-direct_index[4,4,:]).<0))
+
+println("TRAIN pref = $TRAIN_pref")
