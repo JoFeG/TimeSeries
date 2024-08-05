@@ -14,7 +14,15 @@ function LoadDataSet_DIMERC_json(
     return json
 end
 
-function jsonpoints2arrays(
+function PrintDIMERCjsonPointExample(k,i)
+    println("Serie k = $k, de $(length(json))")
+    println("json[$k].name = $(json[k].name)")
+    println("Largo = $(length(json[k].points))")
+    println("json[$k].points[$i] = ")
+    println(json[k].points[i])
+end
+
+function DIMERCjsonpoints2arrays(
         points::JSON3.Array,
         include_time=false
     )
@@ -32,10 +40,37 @@ function jsonpoints2arrays(
     return x, y
 end
 
-function PrintCIMERCjsonPointExample(k,i)
-    println("Serie k = $k, de $(length(json))")
-    println("json[$k].name = $(json[k].name)")
-    println("Largo = $(length(json[k].points))")
-    println("json[$k].points[$i] = ")
-    println(json[k].points[i])
+function DIMERCseriesjson2matrix(points::JSON3.Array)
+    # Constructs a matrix Y of (m × n) with series in the columns and 0s replaced over gaps.
+    
+    n = length(json)
+    series = []
+    xs = []
+    for k = 1:n
+        x, y = DIMERCjsonpoints2arrays(json[k].points)
+
+        series = [series..., y]
+        xs = [xs..., x]
+    end
+    max_x = maximum(maximum.(xs))
+    min_x = minimum(minimum.(xs))
+    println("min_x = ", min_x)
+    println("max_x = ", max_x)
+    m = max_x - min_x
+
+    Y = zeros(m,n)
+
+    for k = 1:n
+        for i = 1:m
+            #println("k=",k,", i=",i)
+            data = series[k][xs[k].==min_x+i-1]
+            if length(data)>0
+                Y[i,k] = data[1]
+            else
+                Y[i,k] = 0
+            end
+        end
+    end
+    
+    return Y, min_x
 end
