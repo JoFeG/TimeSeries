@@ -56,21 +56,21 @@ function DIMERCseriesjson2matrix(points::JSON3.Array)
     min_x = minimum(minimum.(xs))
     println("min_x = ", min_x)
     println("max_x = ", max_x)
-    m = max_x - min_x
+    m = max_x - min_x + 1
 
     Y = zeros(m,n)
 
     for k = 1:n
         for i = 1:m
             #println("k=",k,", i=",i)
-            data = series[k][xs[k].==min_x+i-1]
+            data = series[k][xs[k] .== min_x+i-1]
             if length(data)>0
                 Y[i,k] = data[1]
             else
                 Y[i,k] = 0
             end
         end
-    end
+    end    
     
-    return Y, min_x
+    return Y
 end
