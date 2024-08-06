@@ -32,7 +32,7 @@ function DIMERCjsonpoints2arrays(
     x = [points[k].x for k in 1:m]
     y = [points[k].y for k in 1:m]
     
-    if include_time        
+    if include_time           
         t = [points[k].date for k in 1:m]
         return x, y, t
     end
