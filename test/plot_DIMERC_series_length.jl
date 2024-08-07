@@ -63,11 +63,35 @@ fig = plot(
     xlabel = "Gap lengths"
     )
 
-plot!(
-    log10.(Gap_lengths .+ 1), 
+
+
+bar!(
+    replace(log10.(Gap_lengths),-Inf=>NaN), 
     label = "Gap lengths",
-    fillrange = zeros(n),
-    fillalpha = 0.35
+    fillrange = -.03*ones(n),
+    fillalpha = .6,
+    yticks = (
+        [   
+            log10.(1:9)...,
+            log10.(10:10:90)...,
+            log10.(100:100:900)...,
+            log10.(1000:1000:3000)...
+        ],[
+            "1","2","3","4",
+            ["" for i=1:5]...,
+            "10","20","30","40",
+            ["" for i=1:5]...,
+            "100","200","300","400",
+            ["" for i=1:5]...,
+            "1000","2000","3000"
+        ]),
+    xticks = [1,10:10:274...],
+    tick_direction = :out,
+    bordercolor = :white,
+    legend = :topright,
+    linecolor=RGBA(0,0,0,.4)
     )
+
+
 
 savefig(fig, savepath*"series_gaps_lengths.pdf")
