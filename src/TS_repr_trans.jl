@@ -29,3 +29,13 @@ function TS_exponential_smoothing(y, α)
     
     return ŷ
 end
+
+function TS_zscore_normalization(y)
+    μ = mean(y)
+    σ = std(y)
+
+    ŷ = (y .- μ) / σ
+    
+    return ŷ
+end
+
