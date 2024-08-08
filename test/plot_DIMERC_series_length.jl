@@ -8,10 +8,16 @@ json = LoadDataSet_DIMERC_json()
 Y = DIMERCseriesjson2matrix(json)
 
 m, n = size(Y)
+println("
+     number of series n = $n
+    max series length m = $m")
 
 Lengths = [length(json[k].points) for k = 1:m]
 
-
+k_full = argmax(Lengths)
+println("
+    first week: x = $(json[k_full].points[1].x), date = $(json[k_full].points[1].date)
+     last week: x = $(json[k_full].points[end].x), date = $(json[k_full].points[end].date)")
 
 fig = plot(
     margin=20pt,
@@ -30,13 +36,10 @@ plot!(
 
 savefig(fig, savepath*"series_lengths.pdf")
 
-
-
-
-
-
-
 Gap_lengths = zeros(m)
+
+Gap_cap = 270
+ids_over_cap = zeros(n)
 
 for k = 1:n
     count = 0
@@ -46,12 +49,14 @@ for k = 1:n
         else
             if count > 0
                 Gap_lengths[count] += 1
+                count >= Gap_cap ? ids_over_cap[k] = 1 : nothing
             end
             count = 0
         end
     end
     if count > 0
         Gap_lengths[count] += 1
+        count >= Gap_cap ? ids_over_cap[k] = 1 : nothing
     end
 end
 
@@ -62,8 +67,6 @@ fig = plot(
     ylabel = "Number of gaps",
     xlabel = "Gap lengths"
     )
-
-
 
 bar!(
     replace(log10.(Gap_lengths),-Inf=>NaN), 
@@ -92,6 +95,9 @@ bar!(
     linecolor=RGBA(0,0,0,.4)
     )
 
-
-
 savefig(fig, savepath*"series_gaps_lengths.pdf")
+
+println("
+    Total missing points = $(sum(Y .== 0)) 
+     from a total of n*m = $(n*m)
+         correspontding to $(round(100*sum(Y .== 0)/(n*m),digits=2))%")
