@@ -38,8 +38,8 @@ savefig(fig, savepath*"series_lengths.pdf")
 
 Gap_lengths = zeros(m)
 
-Gap_cap = 270
-ids_over_cap = zeros(n)
+Gap_cap = 104
+ids_over_cap = zeros(Int,n)
 
 for k = 1:n
     count = 0
@@ -100,4 +100,7 @@ savefig(fig, savepath*"series_gaps_lengths.pdf")
 println("
     Total missing points = $(sum(Y .== 0)) 
      from a total of n*m = $(n*m)
-         correspontding to $(round(100*sum(Y .== 0)/(n*m),digits=2))%")
+         correspontding to $(round(100*sum(Y .== 0)/(n*m),digits=2))%
+    
+    The number of series with gaps of size over $Gap_cap is $(sum(ids_over_cap))
+                              correspontding to $(round(100*sum(ids_over_cap)/n,digits=2))%")
