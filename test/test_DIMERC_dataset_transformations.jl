@@ -111,7 +111,8 @@ fig = plot(
 scatter!(
     TT[1,:],
     TT[2,:],
-    marker = :x
+    marker = :o,
+    markersize = 1
 )
 
 display(fig)
