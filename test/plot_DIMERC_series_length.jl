@@ -97,10 +97,19 @@ bar!(
 
 savefig(fig, savepath*"series_gaps_lengths.pdf")
 
+Tot_zeros = sum(Gap_lengths)
+Gap_prop = Gap_lengths / Tot_zeros
+
 println("
     Total missing points = $(sum(Y .== 0)) 
      from a total of n*m = $(n*m)
          correspontding to $(round(100*sum(Y .== 0)/(n*m),digits=2))%
     
     The number of series with gaps of size over $Gap_cap is $(sum(ids_over_cap))
-                              correspontding to $(round(100*sum(ids_over_cap)/n,digits=2))%")
+                              correspontding to $(round(100*sum(ids_over_cap)/n,digits=2))%
+    
+    Gaps of length 1 correspond to $(round(100*Gap_prop[1],digits=2))%
+    Gaps of length 2 correspond to $(round(100*Gap_prop[2],digits=2))%
+    Gaps of length 3 correspond to $(round(100*Gap_prop[3],digits=2))%
+    Gaps of length 4 correspond to $(round(100*Gap_prop[4],digits=2))%
+    ")
