@@ -27,3 +27,15 @@ for k = 1:n
     count_tot >= Max_tot ? ids_over_max_tot[k] = 1 : nothing
 end
 
+println("Series above Max_gap = $(sum(ids_over_max_gap))")
+println("Series above Max_tot = $(sum(ids_over_max_tot))")
+println("Series excluded      = $(sum((ids_over_max_gap + ids_over_max_tot) .> 0))")
+
+YY = Y[:,(ids_over_max_gap + ids_over_max_tot) .== 0]
+m, nn = size(YY)
+
+println("Percentage remaining = $(round(100*nn/n,digits=2))")
+
+indx_is_missing = zeros(Int, m, nn)
+
+Tz_lim = 3
