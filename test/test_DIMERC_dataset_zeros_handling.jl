@@ -58,6 +58,8 @@ for k = 1:nn
 end
 
 println("\n---------------------\n after removals \n")
-println("Total zeros = $(sum(YY.==0))")
+println("Total zeros = $(sum(YY.==0)) 
+             from a total of nn*m = $(nn*m)
+             correspontding to $(round(100*sum(YY .== 0)/(nn*m),digits=2))%")
 println("False zeros = $(sum(indx_is_missing)) (missings)")
 println(" True zeros = $(sum(YY.==0) - sum(indx_is_missing))")
