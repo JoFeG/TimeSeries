@@ -39,3 +39,25 @@ println("Percentage remaining = $(round(100*nn/n,digits=2))")
 indx_is_missing = zeros(Int, m, nn)
 
 Tz_lim = 3
+
+for k = 1:nn
+    zero_count = 0
+    for i = 1:m
+        if YY[i,k] == 0 
+            zero_count += 1
+        else
+            if zero_count >= Tz_lim
+                indx_is_missing[(i-zero_count):i-1,k] .= 1
+            end
+            zero_count = 0
+        end
+    end
+    if zero_count >= Tz_lim
+        indx_is_missing[(m-zero_count+1):m,k] .= 1
+    end
+end
+
+println("\n---------------------\n after removals \n")
+println("Total zeros = $(sum(YY.==0))")
+println("False zeros = $(sum(indx_is_missing)) (missings)")
+println(" True zeros = $(sum(YY.==0) - sum(indx_is_missing))")
