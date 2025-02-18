@@ -38,15 +38,15 @@ end
 ### AGREGAR ETIQUETAS INFORMATIVAS EN LAS FIGURAS DE TRABAJO
 
 fig = plot()
-figname = "fig.svg"
+figname = "DTWA_test_fig.pdf"
 
 
 M2 = ExpEval.calculate_distance_matrix_dtwA(TRAIN, 0)
-ExpEval.scatter_dist_matrices!(M1, M2, save_as="out/$figname", label="γ=0")
+ExpEval.scatter_dist_matrices!(M1, M2, save_as="figs/$figname", label="γ=0")
 
 
 M2 = ExpEval.calculate_distance_matrix_dtwA(TRAIN, 1)
-ExpEval.scatter_dist_matrices!(M1, M2, save_as="out/$figname", label="γ=1")
+ExpEval.scatter_dist_matrices!(M1, M2, save_as="figs/$figname", label="γ=1")
 
 M2 = ExpEval.calculate_distance_matrix_dtwA(TRAIN, 2)
-ExpEval.scatter_dist_matrices!(M1, M2, save_as="out/$figname", label="γ=2")
+ExpEval.scatter_dist_matrices!(M1, M2, save_as="figs/$figname", label="γ=2")
