@@ -114,20 +114,20 @@ end
 
 
 
-function calculate_distance_matrix_dtwA(
+function calculate_distance_matrix_dtwAB(
         X::Matrix{Float64},
         gamma::Int
     )
     
     n, m = size(X)
     
-    X_dist_mat_dtwA = zeros(n, n)
+    X_dist_mat_dtwAB = zeros(n, n)
     for i = 1:n-1
         for j = i+1:n
-            X_dist_mat_dtwA[i,j] = dtw_arrow(X[i,:], X[j,:], γt=gamma)[1]
-            X_dist_mat_dtwA[j,i] = X_dist_mat_dtwA[i,j]
+            X_dist_mat_dtwAB[i,j] = dtw_arrow(X[i,:], X[j,:], γt=gamma)[1]
+            X_dist_mat_dtwAB[j,i] = X_dist_mat_dtwAB[i,j]
         end
     end
         
-    return X_dist_mat_dtwA
+    return X_dist_mat_dtwAB
 end
