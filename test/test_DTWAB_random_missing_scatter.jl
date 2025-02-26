@@ -12,21 +12,31 @@ n, m = size(TRAIN)
 # a missing gap of length uniformly selected between 0 and 10%
 # Starting at an uniformly random placement in the series
 
-M = round(Int,m/5)
+
+M = m                  # Experiment 1
+# M = round(Int,m/5)   # Experiment 2
 
 for i = 1:n
-    gap_max_prop = 0.5
+    gap_max_prop = 0.1
     gap_length = round(Int, gap_max_prop * m * rand())
-    gap_start = rand(1:M)
+    gap_start = rand(1:M-gap_length+1)
+    
+    TRAIN[i, gap_start:gap_start+gap_length-1] .= NaN
+end
+
+for i = 1:n
+    gap_max_prop = 0.1
+    gap_length = round(Int, gap_max_prop * m * rand())
+    gap_start = rand(1:M-gap_length+1)
     
     TRAIN[i, gap_start:gap_start+gap_length-1] .= NaN
 end
 
 # Repeat for 2%
 for i = 1:n
-    gap_max_prop = 0.01
+    gap_max_prop = 0.02
     gap_length = round(Int, gap_max_prop * m * rand())
-    gap_start = rand(1:M)
+    gap_start = rand(1:M-gap_length+1)
     
     TRAIN[i, gap_start:gap_start+gap_length-1] .= NaN
 end
