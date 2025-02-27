@@ -67,7 +67,7 @@ for k = 1:nn
     YY[:, k] = (y .- a) ./ b
 end
 
-
+#=
 norms = sort(norm.(eachcol(YY)), rev=true)
 
 fig = plot(
@@ -84,3 +84,4 @@ bar!(norms,
 )
 
 savefig(fig, "figs/DIMERC_data_norms_after.pdf")
+=#
