@@ -46,3 +46,45 @@ writedlm("../data/dimerc/dist_mat_DTWB_YYclean.csv", DIST_DTWB, ',')
 #### DTWB distance matrix load
 DIST_DTWB = readdlm("./data/dimerc/dist_mat_DTWB_YYclean.csv",',')
 
+
+#### Kmedoids results
+repts = 10
+kclst = 20
+Results = Array{KmedoidsResult}(undef, kclst, repts)
+for k =1:kclst
+    for r = 1:repts
+        Results[k,r] = kmedoids(DIST_DTWB, k)
+        # print(Results[k,r].converged) # it does converge!
+    end
+end
+
+
+using TSne
+using Plots
+
+k = 4
+r = 1
+
+#### TSne plot test
+
+hatYYnan = tsne(DIST_DTWB, 2, 50, 1000, 20.0)
+fig1 = plot(
+        framestyle = :box,
+        ratio  = 1,
+        size   = (600,600)
+    )
+
+scatter!(hatYYnan[:,1], hatYYnan[:,2], color=Results[k,r].assignments)
+
+#### Heatmap plot test
+
+assig = Results[k,r].assignments
+Bord = zeros(size(B))
+
+N = 1
+for i = 1:k
+    group = [assig .== i]
+    ng = sum(sum(group))
+    Bord[N:N+ng-1,:] = B[group...,:]
+    N = N+ng
+end
