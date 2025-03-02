@@ -1,6 +1,8 @@
 using Clustering
 using DelimitedFiles
 using Base.Threads
+using Random
+using Statistics
 include("../src/DIMERC_utils.jl")
 
 json = LoadDataSet_DIMERC_json()
@@ -48,11 +50,12 @@ DIST_DTWB = readdlm("./data/dimerc/dist_mat_DTWB_YYclean.csv",',')
 
 
 #### Kmedoids results
-repts = 10
 kclst = 20
+repts = 10
 Results = Array{KmedoidsResult}(undef, kclst, repts)
 for k =1:kclst
     for r = 1:repts
+        Random.seed!(r)
         Results[k,r] = kmedoids(DIST_DTWB, k)
         # print(Results[k,r].converged) # it does converge!
     end
@@ -62,29 +65,66 @@ end
 using TSne
 using Plots
 
-k = 4
+#### Evaluation
+include("../src/ExpEval.jl")
+evals_DB = zeros(kclst,repts)
+evals_CH = zeros(kclst,repts)
+for k =1:kclst
+    for r = 1:repts
+        evals_DB[k,r] = ExpEval.daviesbouldinindex(Results[k,r].assignments, DIST_DTWB, medoids=Results[k,r].medoids)
+        C_idx = ExpEval.bestMedoids(Results[k,r].assignments, DIST_DTWB)[1]
+        evals_CH[k,r] = ExpEval.calinskiharabaszindex(
+            Results[k,r].assignments, 
+            DIST_DTWB, 
+            medoids=Results[k,r].medoids, 
+            c=C_idx)
+    end
+end
+
+
+k = 2
 r = 1
+
+#### Heatmap plot test
+
+assig = Results[k,r].assignments
+DIST_DTWB_grouped = zeros(size(DIST_DTWB))
+sort = zeros(Int, size(assig))
+let
+    grouped_count = 0
+    for i = 1:k
+        for j = 1:nn    
+            if assig[j] == i
+                grouped_count = grouped_count + 1
+                sort[j] = grouped_count
+            end
+        end
+    end
+end
+    
+for i = 1:nn
+    for j = 1:nn
+        DIST_DTWB_grouped[sort[i], sort[j]] = DIST_DTWB[i,j]
+        DIST_DTWB_grouped[sort[i], sort[j]] = DIST_DTWB_grouped[sort[i], sort[j]]
+    end
+end
+
+fig2 = plot(
+        framestyle = :box,
+        ratio  = 1,
+        size   = (600,600)
+    )
+heatmap!(sqrt.(DIST_DTWB_grouped))
 
 #### TSne plot test
 
-hatYYnan = tsne(DIST_DTWB, 2, 50, 1000, 20.0)
-fig1 = plot(
+Random.seed!(10)
+hatYYnan = tsne(DIST_DTWB_grouped, 2, 50, 1000, 20.0)
+fig3 = plot(
         framestyle = :box,
         ratio  = 1,
         size   = (600,600)
     )
 
-scatter!(hatYYnan[:,1], hatYYnan[:,2], color=Results[k,r].assignments)
+scatter!(hatYYnan[:,1], hatYYnan[:,2], color=[assig[sort.==i][1] for i = 1:nn])
 
-#### Heatmap plot test
-
-assig = Results[k,r].assignments
-Bord = zeros(size(B))
-
-N = 1
-for i = 1:k
-    group = [assig .== i]
-    ng = sum(sum(group))
-    Bord[N:N+ng-1,:] = B[group...,:]
-    N = N+ng
-end
