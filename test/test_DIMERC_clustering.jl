@@ -159,8 +159,8 @@ scatter!(
 
 
 
-k = 3
-r = 3
+k = 6
+r = 1
 
 #### Heatmap plot test
 
@@ -195,8 +195,8 @@ heatmap!(D_grouped)
 
 #### TSne plot test
 
-Random.seed!(1234)
-hatYYnan = tsne(D, 2, 50, 1000, 20.0)
+Random.seed!(100)
+hatYYnan = tsne(D, 2, 50, 1000, 20.0, distance=true)
 fig3 = plot(
         framestyle = :box,
         ratio  = 1,
