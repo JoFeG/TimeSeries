@@ -1,19 +1,19 @@
-include("../src/FREQ_utils.jl")
-path = "./data/freq/raw/2023_set_n1/"
+
+include("../src/ExpEval.jl")
+
 using Plots
 using DelimitedFiles
-summary, header = readdlm("./data/freq/experiment_data_summary.csv", ',', header=true)
 
-n = size(summary)[1]
-m = 101
 
-Y  = zeros(m,n)
-P0 = zeros(n) 
-for i = 1:n
-    y, p0, t = SamplerRaw_FREQ(path * summary[i,1] * ".csv")
-    P0[i] = p0
-    Y[:,i] = y
-end
+ID = 55
+df = ExpEval.LoadDataSumary()
+TEST, TEST_labels, TRAIN, TRAIN_labels = ExpEval.LoadDataBase(ID, df, true);
+
+Y = Array(TRAIN')
+
+m , n = size(Y)
+
+
 
 #=
 #### Normalization
@@ -24,19 +24,6 @@ for i = 1:n
     Y[:,i] = (Y[:,i] .- means[i]) / stds[i]
 end
 =#
-
-### Series plots index colors
-fig1 = plot(
-    size = (600,400), 
-    grid = :y,
-    xticks = 0:2:30,
-    xlabel = "Time [seg]",
-    ylabel = "Δf [Hz]"
-)
-
-for i = 1:n
-    plot!(t,Y[:,i], label=false, color=i)
-end
 
 
 
@@ -65,16 +52,7 @@ scatter!(
 
 
 #### DTW distance matrix calculation 
-
-using DynamicAxisWarping
-D = zeros(n, n)
-Threads.@threads for i = 1:n-1
-    for j = i+1:n
-        D[i,j] = DynamicAxisWarping.dtw(Y[:,i], Y[:,j])[1]
-        D[j,i] = D[i,j]
-    end
-end
-
+D = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
 
 #### DTW TSne plot index colors
 using TSne
@@ -104,7 +82,7 @@ scatter!(
 using Clustering
 using Random
 
-kclst = 8
+kclst = 20
 repts = 10
 Results = Array{KmedoidsResult}(undef, kclst, repts)
 for k =1:kclst
@@ -125,14 +103,14 @@ evals_MS = zeros(kclst,repts)
 
 for k =1:kclst
     for r = 1:repts
-        evals_DB[k,r] = ExpEval.daviesbouldinindex(Results[k,r].assignments, D, medoids=Results[k,r].medoids)
-        C_idx = ExpEval.bestMedoids(Results[k,r].assignments, D)[1]
+        evals_DB[k,r] = ExpEval.daviesbouldinindex(Results[k,r].assignments, sqrt.(D), medoids=Results[k,r].medoids)
+        C_idx = ExpEval.bestMedoids(ones(Int, n), sqrt.(D))[1]
         evals_CH[k,r] = ExpEval.calinskiharabaszindex(
             Results[k,r].assignments, 
-            D, 
+            sqrt.(D), 
             medoids=Results[k,r].medoids, 
             c=C_idx)
-        k>1 ? evals_MS[k,r] = mean(silhouettes(Results[k,r].assignments, D)) : nothing        
+        k>1 ? evals_MS[k,r] = mean(silhouettes(Results[k,r].assignments, sqrt.(D))) : nothing        
     end
 end
 means_DB = [mean(evals_DB[k,:]) for k = 1:kclst]
@@ -143,7 +121,7 @@ std_CH = [std(evals_CH[k,:]) for k = 1:kclst]
 std_MS = [std(evals_MS[k,:]) for k = 1:kclst]
 
 
-K_lim = 8
+K_lim = 20
 
 fig4 = plot(
     margin=20pt,
@@ -171,13 +149,13 @@ scatter!(
 
 plot!(
     2:K_lim, 
-    10*means_MS[2:K_lim],
+    means_MS[2:K_lim],
     color = 2,
-    label = "10 x Mean Silhouette Index (MS)"
+    label = "Mean Silhouette Index (MS)"
 )
 scatter!(
     2:K_lim, 
-    10*means_MS[2:K_lim],
+    means_MS[2:K_lim],
     color = 2,
     label = nothing,
     markerstrokewidth = 0
@@ -201,22 +179,10 @@ scatter!(
 )
 
 
-k = 2
-r = 2
+k = 7
+r = 1
 assig = Results[k,r].assignments
 
-### Series plots assig colors
-fig5 = plot(
-    size = (600,400), 
-    grid = :y,
-    xticks = 0:2:30,
-    xlabel = "Time [seg]",
-    ylabel = "Δf [Hz]"
-)
-
-for i = 1:n
-    plot!(t,Y[:,i], label=false, color=assig[i])
-end
 
 
 
