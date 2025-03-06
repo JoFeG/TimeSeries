@@ -1,7 +1,7 @@
-
 include("../src/ExpEval.jl")
 
 using Plots
+using Measures
 using DelimitedFiles
 
 
@@ -52,13 +52,13 @@ scatter!(
 
 
 #### DTW distance matrix calculation 
-D = ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw")
+D = sqrt.(ExpEval.load_distance_matrix(ID, df, "TRAIN", "dtw"))
 
 #### DTW TSne plot index colors
 using TSne
 using Random
 Random.seed!(100)
-hatY = tsne(sqrt.(D), 2, 50, 1000, 20.0, distance=true)
+hatY = tsne(D, 2, 50, 1000, 20.0, distance=true)
 
 fig3 = plot(
     framestyle = :box,
@@ -103,14 +103,14 @@ evals_MS = zeros(kclst,repts)
 
 for k =1:kclst
     for r = 1:repts
-        evals_DB[k,r] = ExpEval.daviesbouldinindex(Results[k,r].assignments, sqrt.(D), medoids=Results[k,r].medoids)
-        C_idx = ExpEval.bestMedoids(ones(Int, n), sqrt.(D))[1]
+        evals_DB[k,r] = ExpEval.daviesbouldinindex(Results[k,r].assignments, D, medoids=Results[k,r].medoids)
+        C_idx = ExpEval.bestMedoids(ones(Int, n), D)[1]
         evals_CH[k,r] = ExpEval.calinskiharabaszindex(
             Results[k,r].assignments, 
-            sqrt.(D), 
+            D, 
             medoids=Results[k,r].medoids, 
             c=C_idx)
-        k>1 ? evals_MS[k,r] = mean(silhouettes(Results[k,r].assignments, sqrt.(D))) : nothing        
+        k>1 ? evals_MS[k,r] = mean(silhouettes(Results[k,r].assignments, D)) : nothing        
     end
 end
 means_DB = [mean(evals_DB[k,:]) for k = 1:kclst]
@@ -120,8 +120,18 @@ std_DB = [std(evals_DB[k,:]) for k = 1:kclst]
 std_CH = [std(evals_CH[k,:]) for k = 1:kclst]
 std_MS = [std(evals_MS[k,:]) for k = 1:kclst]
 
+best_DB = [minimum(evals_DB[k,:]) for k = 1:kclst]
+best_CH = [maximum(evals_CH[k,:]) for k = 1:kclst]
+best_MS = [maximum(evals_MS[k,:]) for k = 1:kclst]
 
-K_lim = 20
+best_index_DB = [argmin(evals_DB[k,:]) for k = 1:kclst]
+best_index_CH = [argmax(evals_CH[k,:]) for k = 1:kclst]
+best_index_MS = [argmax(evals_MS[k,:]) for k = 1:kclst]
+
+
+
+
+K_lim = 10
 
 fig4 = plot(
     margin=20pt,
@@ -129,19 +139,20 @@ fig4 = plot(
     grid = :x,
     xticks = 2:K_lim,
     xlabel = "Number of Clusters k",
-    ylabel = "Index Value (DB & MS)"
+    ylabel = "Index Value (DB & MS)",
+    legend = :topleft
     )
 
 
 plot!(
     2:K_lim, 
-    means_DB[2:K_lim],
+    best_DB[2:K_lim],
     color = 1,
     label = "Davies Bould Inindex (DB)"
 )
 scatter!(
     2:K_lim, 
-    means_DB[2:K_lim],
+    best_DB[2:K_lim],
     color = 1,
     label = nothing,
     markerstrokewidth = 0
@@ -149,13 +160,13 @@ scatter!(
 
 plot!(
     2:K_lim, 
-    means_MS[2:K_lim],
+    best_MS[2:K_lim],
     color = 2,
     label = "Mean Silhouette Index (MS)"
 )
 scatter!(
     2:K_lim, 
-    means_MS[2:K_lim],
+    best_MS[2:K_lim],
     color = 2,
     label = nothing,
     markerstrokewidth = 0
@@ -164,7 +175,7 @@ scatter!(
 plot!(
     twinx(),
     2:K_lim, 
-    means_CH[2:K_lim],
+    best_CH[2:K_lim],
     color = 3,
     label = "Calinski Harabasz Index (CH)",
     ylabel = "Index Value (CH)"
@@ -172,7 +183,7 @@ plot!(
 scatter!(
     twinx(),
     2:K_lim, 
-    means_CH[2:K_lim],
+    best_CH[2:K_lim],
     color = 3,
     label = nothing,
     markerstrokewidth = 0
@@ -248,4 +259,4 @@ fig8 = plot(
         ratio  = 1,
         size   = (400,400)
     )
-heatmap!(sqrt.(D_grouped))
+heatmap!(D_grouped)

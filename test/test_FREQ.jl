@@ -1,6 +1,7 @@
 include("../src/FREQ_utils.jl")
 path = "./data/freq/raw/2023_set_n1/"
 using Plots
+using Measures
 using DelimitedFiles
 summary, header = readdlm("./data/freq/experiment_data_summary.csv", ',', header=true)
 
@@ -9,6 +10,7 @@ m = 101
 
 Y  = zeros(m,n)
 P0 = zeros(n) 
+y, p0, t = SamplerRaw_FREQ(path * summary[1,1] * ".csv")
 for i = 1:n
     y, p0, t = SamplerRaw_FREQ(path * summary[i,1] * ".csv")
     P0[i] = p0
@@ -26,6 +28,7 @@ end
 =#
 
 ### Series plots index colors
+
 fig1 = plot(
     size = (600,400), 
     grid = :y,
@@ -74,13 +77,14 @@ Threads.@threads for i = 1:n-1
         D[j,i] = D[i,j]
     end
 end
+D = sqrt.(D) 
 
 
 #### DTW TSne plot index colors
 using TSne
 using Random
 Random.seed!(100)
-hatY = tsne(sqrt.(D), 2, 50, 1000, 20.0, distance=true)
+hatY = tsne(D, 2, 50, 1000, 20.0, distance=true)
 
 fig3 = plot(
     framestyle = :box,
@@ -98,11 +102,14 @@ scatter!(
     ylabel = "dim2"
     ) 
 
-
+savefig(fig1,"./figs/FREQ_series_color_index.pdf")
+savefig(fig2,"./figs/FREQ_pca_color_index.pdf")
+savefig(fig3,"./figs/FREQ_tsne_color_index.pdf")
 
 #### Kmeans results
 using Clustering
 using Random
+using Statistics
 
 kclst = 8
 repts = 10
@@ -142,6 +149,14 @@ std_DB = [std(evals_DB[k,:]) for k = 1:kclst]
 std_CH = [std(evals_CH[k,:]) for k = 1:kclst]
 std_MS = [std(evals_MS[k,:]) for k = 1:kclst]
 
+best_DB = [minimum(evals_DB[k,:]) for k = 1:kclst]
+best_CH = [maximum(evals_CH[k,:]) for k = 1:kclst]
+best_MS = [maximum(evals_MS[k,:]) for k = 1:kclst]
+
+best_index_DB = [argmin(evals_DB[k,:]) for k = 1:kclst]
+best_index_CH = [argmax(evals_CH[k,:]) for k = 1:kclst]
+best_index_MS = [argmax(evals_MS[k,:]) for k = 1:kclst]
+
 
 K_lim = 8
 
@@ -151,19 +166,20 @@ fig4 = plot(
     grid = :x,
     xticks = 2:K_lim,
     xlabel = "Number of Clusters k",
-    ylabel = "Index Value (DB & MS)"
+    ylabel = "Index Value (DB & MS)",
+    legend = :topleft
     )
 
 
 plot!(
     2:K_lim, 
-    means_DB[2:K_lim],
+    best_DB[2:K_lim],
     color = 1,
     label = "Davies Bould Inindex (DB)"
 )
 scatter!(
     2:K_lim, 
-    means_DB[2:K_lim],
+    best_DB[2:K_lim],
     color = 1,
     label = nothing,
     markerstrokewidth = 0
@@ -171,13 +187,13 @@ scatter!(
 
 plot!(
     2:K_lim, 
-    10*means_MS[2:K_lim],
+    best_MS[2:K_lim],
     color = 2,
-    label = "10 x Mean Silhouette Index (MS)"
+    label = "Mean Silhouette Index (MS)"
 )
 scatter!(
     2:K_lim, 
-    10*means_MS[2:K_lim],
+    best_MS[2:K_lim],
     color = 2,
     label = nothing,
     markerstrokewidth = 0
@@ -186,7 +202,7 @@ scatter!(
 plot!(
     twinx(),
     2:K_lim, 
-    means_CH[2:K_lim],
+    best_CH[2:K_lim],
     color = 3,
     label = "Calinski Harabasz Index (CH)",
     ylabel = "Index Value (CH)"
@@ -194,15 +210,17 @@ plot!(
 scatter!(
     twinx(),
     2:K_lim, 
-    means_CH[2:K_lim],
+    best_CH[2:K_lim],
     color = 3,
     label = nothing,
     markerstrokewidth = 0
 )
 
 
-k = 2
-r = 2
+savefig(fig4,"./figs/FREQ_clust_eval.pdf")
+
+
+for (k,r) in [(2,1),(3,6)]
 assig = Results[k,r].assignments
 
 ### Series plots assig colors
@@ -282,4 +300,11 @@ fig8 = plot(
         ratio  = 1,
         size   = (400,400)
     )
-heatmap!(sqrt.(D_grouped))
+heatmap!(D_grouped)
+
+savefig(fig5,"./figs/FREQ_series_color_k$(k)_r$r.pdf")
+savefig(fig6,"./figs/FREQ_pca_color_k$(k)_r$r.pdf")
+savefig(fig7,"./figs/FREQ_tsne_color_k$(k)_r$r.pdf")
+savefig(fig8,"./figs/FREQ_heatmap_color_k$(k)_r$r.pdf")
+
+end
