@@ -106,6 +106,10 @@ savefig(fig1,"./figs/FREQ_series_color_index.pdf")
 savefig(fig2,"./figs/FREQ_pca_color_index.pdf")
 savefig(fig3,"./figs/FREQ_tsne_color_index.pdf")
 
+writedlm("./data/freq/FREQ_pca_2D_points.csv", T[1:2,:]', ',')
+writedlm("./data/freq/FREQ_tsne_2D_points.csv", hatY[:,1:2], ',')
+
+
 #### Kmeans results
 using Clustering
 using Random
@@ -221,90 +225,119 @@ savefig(fig4,"./figs/FREQ_clust_eval.pdf")
 
 
 for (k,r) in [(2,1),(3,6)]
-assig = Results[k,r].assignments
+    assig = Results[k,r].assignments
 
-### Series plots assig colors
-fig5 = plot(
-    size = (600,400), 
-    grid = :y,
-    xticks = 0:2:30,
-    xlabel = "Time [seg]",
-    ylabel = "Δf [Hz]"
-)
-
-for i = 1:n
-    plot!(t,Y[:,i], label=false, color=assig[i])
-end
-
-
-
-#### PCA plot assig colors
-fig6 = plot(
-    framestyle = :box,
-    ratio  = 1,
-    size = (400,400)
+    ### Series plots assig colors
+    fig5 = plot(
+        size = (600,400), 
+        grid = :y,
+        xticks = 0:2:30,
+        xlabel = "Time [seg]",
+        ylabel = "Δf [Hz]"
     )
 
-scatter!(
-    T[1,:],
-    T[2,:],
-    color = assig,
-    markerstrokewidth = 0,
-    label = false,
-    xlabel = "First Principal Component",
-    ylabel = "Second Principal Component"
-)
+    for i = 1:n
+        plot!(t,Y[:,i], label=false, color=assig[i])
+    end
 
 
-#### DTW TSne plot assig colors
-fig7 = plot(
-    framestyle = :box,
-    ratio  = 1,
-    size = (400,400)
+
+    #### PCA plot assig colors
+    fig6 = plot(
+        framestyle = :box,
+        ratio  = 1,
+        size = (400,400)
+        )
+
+    scatter!(
+        T[1,:],
+        T[2,:],
+        color = assig,
+        markerstrokewidth = 0,
+        label = false,
+        xlabel = "First Principal Component",
+        ylabel = "Second Principal Component"
     )
 
-scatter!(
-    hatY[:,1], 
-    hatY[:,2],
-    color = assig, 
-    markerstrokewidth = 0,
-    label = false,
-    xlabel = "dim1",
-    ylabel = "dim2"
-    ) 
 
-#### Heatmap plot test
-D_grouped = zeros(size(D))
-sort = zeros(Int, size(assig))
-let
-    grouped_count = 0
-    for i = 1:k
-        for j = 1:n    
-            if assig[j] == i
-                grouped_count = grouped_count + 1
-                sort[j] = grouped_count
+    #### DTW TSne plot assig colors
+    fig7 = plot(
+        framestyle = :box,
+        ratio  = 1,
+        size = (400,400)
+        )
+
+    scatter!(
+        hatY[:,1], 
+        hatY[:,2],
+        color = assig, 
+        markerstrokewidth = 0,
+        label = false,
+        xlabel = "dim1",
+        ylabel = "dim2"
+        ) 
+
+    #### Heatmap plot test
+    D_grouped = zeros(size(D))
+    sort = zeros(Int, size(assig))
+    let
+        grouped_count = 0
+        for i = 1:k
+            for j = 1:n    
+                if assig[j] == i
+                    grouped_count = grouped_count + 1
+                    sort[j] = grouped_count
+                end
             end
         end
     end
-end
-    
-for i = 1:n
-    for j = 1:n
-        D_grouped[sort[i], sort[j]] = D[i,j]
-        D_grouped[sort[i], sort[j]] = D_grouped[sort[i], sort[j]]
+
+    for i = 1:n
+        for j = 1:n
+            D_grouped[sort[i], sort[j]] = D[i,j]
+            D_grouped[sort[i], sort[j]] = D_grouped[sort[i], sort[j]]
+        end
     end
+
+    fig8 = plot(
+            framestyle = :grid,
+            ratio  = 1,
+            size   = (400,400)
+        )
+    heatmap!(D_grouped)
+
+    savefig(fig5,"./figs/FREQ_series_color_k$(k)_r$r.pdf")
+    savefig(fig6,"./figs/FREQ_pca_color_k$(k)_r$r.pdf")
+    savefig(fig7,"./figs/FREQ_tsne_color_k$(k)_r$r.pdf")
+    savefig(fig8,"./figs/FREQ_heatmap_color_k$(k)_r$r.pdf")
+    
+    writedlm("./data/freq/FREQ_colors_k$(k)_r$r.csv", assig, ',')
 end
 
-fig8 = plot(
-        framestyle = :grid,
-        ratio  = 1,
-        size   = (400,400)
-    )
-heatmap!(D_grouped)
 
-savefig(fig5,"./figs/FREQ_series_color_k$(k)_r$r.pdf")
-savefig(fig6,"./figs/FREQ_pca_color_k$(k)_r$r.pdf")
-savefig(fig7,"./figs/FREQ_tsne_color_k$(k)_r$r.pdf")
-savefig(fig8,"./figs/FREQ_heatmap_color_k$(k)_r$r.pdf")
 
+############################### MODEL CLUSTERING ########################################
+
+data_mod, header_mod = readdlm("./data/freq/models_experimet_results.csv", ',', header=true)
+
+data_modB2 = data_mod[data_mod[:,4].=="B2",:]
+
+X = zeros(3,23) 
+
+for i = 1:size(data_modB2)[1]
+    typeof(data_modB2[i,5])==Float64 ? nothing : data_modB2[i,5] = Inf
+end
+
+let
+    i = 1
+    for inst in unique(data_modB2[:,2])
+        best_indx = argmin(data_modB2[data_modB2[:,2].==inst,5])
+        X[:,i] = data_modB2[data_modB2[:,2].==inst,:][best_indx,10:12]
+        
+        println("$i")
+        println("$inst")
+        println("$best_indx")
+        println("$( X[:,i])")
+        i = i + 1
+    end
 end
