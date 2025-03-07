@@ -333,11 +333,18 @@ let
     for inst in unique(data_modB2[:,2])
         best_indx = argmin(data_modB2[data_modB2[:,2].==inst,5])
         X[:,i] = data_modB2[data_modB2[:,2].==inst,:][best_indx,10:12]
-        
-        println("$i")
-        println("$inst")
-        println("$best_indx")
-        println("$( X[:,i])")
         i = i + 1
     end
 end
+
+clusterings = kmeans.(Ref(X), 2:6)
+clustering_quality.(Ref(X), clusterings, quality_index = :silhouettes)
+
+k=2
+VI2 = Clustering.varinfo(clusterings[k-1].assignments,Results[k,1].assignments)
+println("k = 2 --> VI = $VI2")
+
+
+k=3
+VI3 = Clustering.varinfo(clusterings[k-1].assignments,Results[k,6].assignments)
+println("k = 3 --> VI = $VI3")
