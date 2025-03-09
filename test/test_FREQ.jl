@@ -341,10 +341,10 @@ clusterings = kmeans.(Ref(X), 2:6)
 clustering_quality.(Ref(X), clusterings, quality_index = :silhouettes)
 
 k=2
-VI2 = Clustering.varinfo(clusterings[k-1].assignments,Results[k,1].assignments)
+VI2 = Clustering.varinfo(clusterings[2].assignments,Results[k,1].assignments)
 println("k = 2 --> VI = $VI2")
 
 
 k=3
-VI3 = Clustering.varinfo(clusterings[k-1].assignments,Results[k,6].assignments)
+VI3 = Clustering.varinfo(clusterings[2].assignments,Results[k,6].assignments)
 println("k = 3 --> VI = $VI3")
